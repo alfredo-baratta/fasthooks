@@ -1,0 +1,81 @@
+[package]
+name = "fasthooks"
+version = "0.1.0"
+edition = "2021"
+authors = ["Alfredo Baratta <alfredobaratta@outlook.com>"]
+description = "Blazing fast Git hooks manager written in Rust. Drop-in replacement for Husky with 27x faster startup."
+license = "MIT"
+repository = "https://github.com/alfredo-baratta/fasthooks"
+homepage = "https://github.com/alfredo-baratta/fasthooks"
+documentation = "https://github.com/alfredo-baratta/fasthooks/tree/main/docs"
+readme = "README.md"
+keywords = ["git", "hooks", "pre-commit", "lint", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+rust-version = "1.70"
+
+[dependencies]
+# CLI framework
+clap = { version = "4.4", features = ["derive", "env", "color"] }
+
+# Async runtime for parallel execution
+tokio = { version = "1.35", features = ["full"] }
+
+# Configuration parsing
+toml = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Git operations (using libgit2 for performance)
+# Using vendored libgit2 to avoid OpenSSL dependency issues on cross-compilation
+git2 = { version = "0.18", default-features = false, features = ["vendored-libgit2"] }
+
+# File system utilities
+glob = "0.3"
+walkdir = "2.4"
+notify = "6.1"
+
+# Terminal output
+colored = "2.1"
+indicatif = { version = "0.17", features = ["tokio"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Time measurement for benchmarks
+chrono = "0.4"
+
+# Process execution
+which = "6.0"
+
+# Regex for condition matching
+regex = "1.10"
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.1"
+tempfile = "3.10"
+criterion = "0.5"
+
+[[bin]]
+name = "fasthooks"
+path = "src/main.rs"
+
+[[bench]]
+name = "hook_execution"
+harness = false
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+opt-level = 3
+
+[profile.dev]
+opt-level = 0
+debug = true
